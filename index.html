@@ -9,7 +9,6 @@
         :root {
             --primary-blue: #0984e3;
             --primary-green: #00b894;
-            --accent-yellow: #f1c40f;
             --done-color: #2ecc71;
         }
 
@@ -153,8 +152,8 @@
         
         let currentNumber, currentWord, currentPillElement, mediaRecorder, audioChunks = [];
 
-        // UPDATED SCRIPT URL
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwDdoKEP0SzGhgp79wmyUaPmBTvjeFZb7tTwo8zuQsgUq8orylgCSaZqaNFdxrYJNdf4A/exec';
+        // YOUR NEW WEB APP URL
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyyr780m6j5aSnQnOdZYCxXGuX424DMLTsfLVe2BdqQktynn_yONBGWJjmUzt90qao_jA/exec';
 
         for (let i = 1; i <= 25; i++) {
             const pill = document.createElement('div');
@@ -213,6 +212,8 @@
                     currentPillElement.classList.add('completed');
                     statusText.innerText = "saved!";
                     setTimeout(closeModal, 1000);
+                }).catch(() => {
+                    statusText.innerText = "error saving to drive.";
                 });
             };
         }
