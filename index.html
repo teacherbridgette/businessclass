@@ -24,7 +24,7 @@
             overflow: hidden;
         }
 
-        /* 16:9 canva-style aspect ratio */
+        /* 16:9 aspect ratio container */
         .game-canvas {
             width: 100vw;
             height: 56.25vw;
@@ -201,7 +201,7 @@
         let mediaRecorder;
         let audioChunks = [];
 
-        // the bridge to your google drive
+        // Your specific Google Apps Script Web App URL
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzWA6Sc80b5H5vWeLQexeyu7n-mEkalXX2yuFMlwBSiKZydg6qxFyKx8pFqFvJRf5q2Zg/exec';
 
         for (let i = 1; i <= 25; i++) {
@@ -265,7 +265,6 @@
                     }),
                     mode: 'no-cors'
                 }).then(() => {
-                    // update button on main screen
                     currentPillElement.innerText = "done ✓";
                     currentPillElement.classList.add('completed');
                     statusText.innerText = "saved! you can close now.";
