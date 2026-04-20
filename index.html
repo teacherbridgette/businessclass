@@ -65,6 +65,7 @@
             font-family: inherit; font-size: 2.5vw; padding: 3%; 
             border-radius: 60px; border: none; cursor: pointer; 
             color: white; width: 100%; margin-bottom: 10px; text-transform: lowercase;
+            font-weight: bold;
         }
 
         .btn-start { background: var(--green); }
@@ -92,7 +93,7 @@
 
     <script>
         // YOUR NEWEST WEB APP URL
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzM4hmHjQ3kGh3yvicl-kgtwnCFFdP_o4q_ryVBIPH6NqqLQlpSKvIyd_NznpFe_bLrlA/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwZnYExVEL9ooojJ4MicbuX_MGm6r5xnpUAYzJ1sQzCuP8Wa_A2fg6sPEiUAXGnL2okOw/exec';
 
         const words = ["draw", "read", "write", "sing", "dance", "jump", "swim"];
         let curNum, curPill, recorder, chunks = [];
@@ -119,7 +120,7 @@
                 recorder.start();
                 document.getElementById('startBtn').style.display = 'none';
                 document.getElementById('stopBtn').style.display = 'block';
-                document.getElementById('status').innerText = "recording now...";
+                document.getElementById('status').innerText = "recording...";
             } catch (err) {
                 document.getElementById('status').innerText = "mic error - please allow access";
             }
@@ -136,17 +137,23 @@
             reader.readAsDataURL(blob);
             reader.onloadend = () => {
                 const base64 = reader.result.split(',')[1];
-                const filename = `student_${curNum}_${Date.now()}.webm`;
+                
+                // Using URLSearchParams to bypass iPad security blocks
+                const params = new URLSearchParams();
+                params.append('audio', base64);
+                params.append('filename', 'student_' + curNum + '_' + Date.now() + '.webm');
 
                 fetch(scriptURL, {
                     method: 'POST',
-                    body: JSON.stringify({ audio: base64, filename: filename }),
+                    body: params,
                     mode: 'no-cors' 
                 }).then(() => {
                     curPill.innerText = "done ✓";
                     curPill.classList.add('completed');
                     document.getElementById('status').innerText = "successfully saved!";
                     setTimeout(closeModal, 1500);
+                }).catch(err => {
+                    document.getElementById('status').innerText = "error - try again";
                 });
             };
         }
