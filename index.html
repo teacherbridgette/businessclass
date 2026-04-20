@@ -24,7 +24,6 @@
             overflow: hidden;
         }
 
-        /* 16:9 aspect ratio container */
         .game-canvas {
             width: 100vw;
             height: 56.25vw;
@@ -42,20 +41,8 @@
             border: 8px solid var(--primary-blue);
         }
 
-        h1 { 
-            color: var(--primary-green); 
-            margin: 0;
-            font-size: 4vw;
-            font-weight: 600;
-            text-transform: lowercase;
-        }
-
-        p.subtitle {
-            color: var(--primary-blue);
-            font-size: 1.5vw;
-            margin-bottom: 2%;
-            text-transform: lowercase;
-        }
+        h1 { color: var(--primary-green); margin: 0; font-size: 4vw; font-weight: 600; text-transform: lowercase; }
+        p.subtitle { color: var(--primary-blue); font-size: 1.5vw; margin-bottom: 2%; text-transform: lowercase; }
 
         .grid {
             display: grid;
@@ -86,7 +73,6 @@
             box-shadow: 0 0.4vw 0 #00705a;
         }
 
-        /* styling for finished numbers */
         .pill.completed {
             background: var(--done-color) !important;
             box-shadow: 0 0.4vw 0 #27ae60 !important;
@@ -95,60 +81,35 @@
             opacity: 0.9;
         }
 
-        .pill:not(.completed):active {
-            transform: translateY(0.3vw);
-            box-shadow: 0 0.1vw 0 #054475;
-        }
+        .pill:not(.completed):active { transform: translateY(0.3vw); box-shadow: 0 0.1vw 0 #054475; }
 
         #recordingOverlay {
             display: none;
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(45, 52, 54, 0.95);
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            border-radius: 7px;
+            justify-content: center; align-items: center;
+            z-index: 100; border-radius: 7px;
         }
 
         .modal-content {
-            background: white;
-            padding: 3%;
-            border-radius: 3vw;
-            text-align: center;
-            width: 45%;
-            border: 6px solid var(--primary-green);
+            background: white; padding: 3%; border-radius: 3vw;
+            text-align: center; width: 45%; border: 6px solid var(--primary-green);
         }
 
         .word-display {
-            font-size: 6vw;
-            font-weight: 600;
-            color: #d63031;
-            margin: 3% 0;
-            padding: 2%;
-            border-bottom: 4px dashed #b2bec3;
+            font-size: 6vw; font-weight: 600; color: #d63031;
+            margin: 3% 0; padding: 2%; border-bottom: 4px dashed #b2bec3;
             text-transform: lowercase;
         }
 
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5vh;
-        }
+        .controls { display: flex; flex-direction: column; gap: 1.5vh; }
 
         button {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 2vw;
-            font-weight: 600;
-            padding: 2%;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            color: white;
-            text-transform: lowercase;
+            font-family: 'Fredoka', sans-serif; font-size: 2vw; font-weight: 600;
+            padding: 2%; border: none; border-radius: 50px;
+            cursor: pointer; color: white; text-transform: lowercase;
             box-shadow: 0 0.3vw 0 rgba(0,0,0,0.2);
         }
 
@@ -157,11 +118,8 @@
         .btn-close { background-color: #636e72; margin-top: 1vh; }
 
         #statusText {
-            margin-top: 1.5vh;
-            font-size: 1.4vw;
-            color: var(--primary-blue);
-            font-weight: 600;
-            text-transform: lowercase;
+            margin-top: 1.5vh; font-size: 1.4vw; color: var(--primary-blue);
+            font-weight: 600; text-transform: lowercase;
         }
     </style>
 </head>
@@ -170,14 +128,12 @@
     <div class="game-canvas">
         <h1>pick your student number</h1>
         <p class="subtitle">tap your number to see your word and record!</p>
-        
         <div class="grid" id="pillGrid"></div>
 
         <div id="recordingOverlay">
             <div class="modal-content">
                 <h2 style="margin:0; font-size: 2.5vw; color: var(--primary-blue); text-transform: lowercase;">say this word:</h2>
                 <div id="wordBox" class="word-display">word</div>
-                
                 <div class="controls">
                     <button id="startBtn" class="btn-start" onclick="startRecording()">start record</button>
                     <button id="endBtn" class="btn-end" onclick="stopRecording()">end & save</button>
@@ -195,27 +151,21 @@
         const wordBox = document.getElementById('wordBox');
         const statusText = document.getElementById('statusText');
         
-        let currentNumber = 0;
-        let currentWord = "";
-        let currentPillElement = null;
-        let mediaRecorder;
-        let audioChunks = [];
+        let currentNumber, currentWord, currentPillElement, mediaRecorder, audioChunks = [];
 
-        // Your specific Google Apps Script Web App URL
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzWA6Sc80b5H5vWeLQexeyu7n-mEkalXX2yuFMlwBSiKZydg6qxFyKx8pFqFvJRf5q2Zg/exec';
+        // UPDATED SCRIPT URL
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwDdoKEP0SzGhgp79wmyUaPmBTvjeFZb7tTwo8zuQsgUq8orylgCSaZqaNFdxrYJNdf4A/exec';
 
         for (let i = 1; i <= 25; i++) {
             const pill = document.createElement('div');
             pill.className = 'pill';
-            pill.id = 'pill-' + i;
             pill.innerText = i;
             pill.onclick = () => openRecording(i, pill);
             grid.appendChild(pill);
         }
 
         function openRecording(num, el) {
-            currentNumber = num;
-            currentPillElement = el;
+            currentNumber = num; currentPillElement = el;
             currentWord = words[Math.floor(Math.random() * words.length)];
             wordBox.innerText = currentWord;
             overlay.style.display = 'flex';
@@ -239,9 +189,7 @@
                 document.getElementById('startBtn').style.display = 'none';
                 document.getElementById('endBtn').style.display = 'block';
                 statusText.innerText = "recording... speak clearly!";
-            } catch (err) {
-                statusText.innerText = "error: mic access required.";
-            }
+            } catch (err) { statusText.innerText = "error: mic access required."; }
         }
 
         function stopRecording() {
@@ -256,30 +204,22 @@
             reader.readAsDataURL(audioBlob);
             reader.onloadend = () => {
                 const base64data = reader.result.split(',')[1];
-
                 fetch(scriptURL, {
                     method: 'POST',
-                    body: JSON.stringify({ 
-                        audio: base64data, 
-                        filename: `student_${currentNumber}_${currentWord}.webm` 
-                    }),
+                    body: JSON.stringify({ audio: base64data, filename: `student_${currentNumber}_${currentWord}.webm` }),
                     mode: 'no-cors'
                 }).then(() => {
                     currentPillElement.innerText = "done ✓";
                     currentPillElement.classList.add('completed');
-                    statusText.innerText = "saved! you can close now.";
-                    setTimeout(closeModal, 1200);
-                }).catch(() => {
-                    statusText.innerText = "error saving. check internet.";
+                    statusText.innerText = "saved!";
+                    setTimeout(closeModal, 1000);
                 });
             };
         }
 
         function closeModal() {
             overlay.style.display = 'none';
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                mediaRecorder.stop();
-            }
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
         }
     </script>
 </body>
