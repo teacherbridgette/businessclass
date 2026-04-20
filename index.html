@@ -10,7 +10,7 @@
             --primary-blue: #0984e3;
             --primary-green: #00b894;
             --accent-yellow: #f1c40f;
-            --text-color: #2d3436;
+            --done-color: #2ecc71;
         }
 
         body {
@@ -22,11 +22,8 @@
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            /* Force lowercase for everything in the body if desired, 
-               but here we just remove the small-caps/uppercase rules */
         }
 
-        /* 16:9 Canvas Container */
         .game-canvas {
             width: 100vw;
             height: 56.25vw;
@@ -49,7 +46,7 @@
             margin: 0;
             font-size: 4vw;
             font-weight: 600;
-            text-transform: lowercase; /* Ensures small letters */
+            text-transform: lowercase;
         }
 
         p.subtitle {
@@ -74,13 +71,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2.8vw;
+            font-size: 2.5vw;
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 0.4vw 0 #054475;
             transition: all 0.1s;
             color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            text-transform: lowercase;
         }
 
         .pill:nth-child(even) {
@@ -88,7 +85,15 @@
             box-shadow: 0 0.4vw 0 #00705a;
         }
 
-        .pill:active {
+        .pill.completed {
+            background: var(--done-color) !important;
+            box-shadow: 0 0.4vw 0 #27ae60 !important;
+            cursor: default;
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        .pill:not(.completed):active {
             transform: translateY(0.3vw);
             box-shadow: 0 0.1vw 0 #054475;
         }
@@ -123,7 +128,7 @@
             margin: 3% 0;
             padding: 2%;
             border-bottom: 4px dashed #b2bec3;
-            text-transform: lowercase; /* Small letters for vocab */
+            text-transform: lowercase;
         }
 
         .controls {
@@ -141,13 +146,11 @@
             border-radius: 50px;
             cursor: pointer;
             color: white;
-            box-shadow: 0 0.3vw 0 rgba(0,0,0,0.2);
-            text-transform: lowercase; /* Small letters for buttons */
+            text-transform: lowercase;
         }
 
         .btn-start { background-color: var(--primary-green); }
         .btn-end { background-color: #d63031; display: none; }
-        .btn-retry { background-color: var(--accent-yellow); color: #2d3436; display: none; }
         .btn-close { background-color: #636e72; margin-top: 1vh; }
 
         #statusText {
@@ -175,7 +178,6 @@
                 <div class="controls">
                     <button id="startBtn" class="btn-start" onclick="startRecording()">start record</button>
                     <button id="endBtn" class="btn-end" onclick="stopRecording()">end & save</button>
-                    <button id="retryBtn" class="btn-retry" onclick="retryRecording()">try again</button>
                     <button class="btn-close" onclick="closeModal()">close</button>
                 </div>
                 <div id="statusText">ready...</div>
@@ -192,19 +194,22 @@
         
         let currentNumber = 0;
         let currentWord = "";
+        let currentPillElement = null;
         let mediaRecorder;
         let audioChunks = [];
 
         for (let i = 1; i <= 25; i++) {
             const pill = document.createElement('div');
             pill.className = 'pill';
+            pill.id = 'pill-' + i;
             pill.innerText = i;
-            pill.onclick = () => openRecording(i);
+            pill.onclick = () => openRecording(i, pill);
             grid.appendChild(pill);
         }
 
-        function openRecording(num) {
+        function openRecording(num, el) {
             currentNumber = num;
+            currentPillElement = el;
             currentWord = words[Math.floor(Math.random() * words.length)];
             wordBox.innerText = currentWord;
             overlay.style.display = 'flex';
@@ -214,7 +219,6 @@
         function resetButtons() {
             document.getElementById('startBtn').style.display = 'block';
             document.getElementById('endBtn').style.display = 'none';
-            document.getElementById('retryBtn').style.display = 'none';
             statusText.innerText = "tap start to record your voice!";
         }
 
@@ -240,16 +244,13 @@
             statusText.innerText = "sending to drive...";
         }
 
-        function retryRecording() {
-            resetButtons();
-        }
-
         function uploadFile() {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
             const reader = new FileReader();
             reader.readAsDataURL(audioBlob);
             reader.onloadend = () => {
                 const base64data = reader.result.split(',')[1];
+                // replace this with your actual google apps script web app url
                 const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
 
                 fetch(scriptURL, {
@@ -260,10 +261,13 @@
                     }),
                     mode: 'no-cors'
                 }).then(() => {
-                    statusText.innerText = "great job! saved successfully.";
-                    document.getElementById('retryBtn').style.display = 'block';
+                    currentPillElement.innerText = "done ✓";
+                    currentPillElement.classList.add('completed');
+                    statusText.innerText = "saved! you can close now.";
+                    setTimeout(closeModal, 1200);
                 }).catch(() => {
-                    statusText.innerText = "error saving. check internet.";
+                    statusText.innerText = "error saving. try again.";
+                    document.getElementById('startBtn').style.display = 'block';
                 });
             };
         }
