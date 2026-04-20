@@ -16,7 +16,7 @@
             align-items: center; 
             height: 100vh; 
             overflow: hidden; 
-            text-transform: lowercase;
+            text-transform: lowercase; 
         }
 
         .game-canvas { 
@@ -50,7 +50,7 @@
 
         #overlay { 
             display: none; position: absolute; top: 0; left: 0; 
-            width: 100%; height: 100%; background: rgba(0,0,0,0.95); 
+            width: 100%; height: 100%; background: rgba(0,0,0,0.9); 
             justify-content: center; align-items: center; z-index: 100; 
         }
 
@@ -59,18 +59,17 @@
             text-align: center; width: 50%; border: 8px solid var(--green); 
         }
 
-        .word { font-size: 8vw; color: #d63031; margin: 20px 0; font-weight: bold; }
+        .word-display { font-size: 8vw; color: #d63031; margin: 20px 0; font-weight: bold; }
         
         button { 
             font-family: inherit; font-size: 2.5vw; padding: 3%; 
             border-radius: 60px; border: none; cursor: pointer; 
             color: white; width: 100%; margin-bottom: 10px; text-transform: lowercase;
-            font-weight: bold;
         }
 
-        .start { background: var(--green); }
-        .stop { background: #d63031; display: none; }
-        .close { background: #636e72; }
+        .btn-start { background: var(--green); }
+        .btn-stop { background: #d63031; display: none; }
+        .btn-close { background: #636e72; }
         #status { font-size: 1.5vw; margin-top: 10px; color: var(--blue); font-weight: bold; }
     </style>
 </head>
@@ -82,10 +81,10 @@
         
         <div id="overlay">
             <div class="modal">
-                <div class="word" id="word">word</div>
-                <button id="startBtn" class="start" onclick="startRec()">start record</button>
-                <button id="stopBtn" class="stop" onclick="stopRec()">end & save</button>
-                <button class="close" onclick="closeM()">close</button>
+                <div class="word-display" id="wordBox">word</div>
+                <button id="startBtn" class="btn-start" onclick="startRec()">start record</button>
+                <button id="stopBtn" class="btn-stop" onclick="stopRec()">end & save</button>
+                <button class="btn-close" onclick="closeModal()">close</button>
                 <div id="status">ready...</div>
             </div>
         </div>
@@ -93,7 +92,7 @@
 
     <script>
         // YOUR NEWEST WEB APP URL
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwmFLME2bNmFSvlMykSl0khu4tQ8j3pb079aHuUwR027VXkgBPTxFJZ5H5OeiH0LXXkkQ/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzM4hmHjQ3kGh3yvicl-kgtwnCFFdP_o4q_ryVBIPH6NqqLQlpSKvIyd_NznpFe_bLrlA/exec';
 
         const words = ["draw", "read", "write", "sing", "dance", "jump", "swim"];
         let curNum, curPill, recorder, chunks = [];
@@ -103,7 +102,7 @@
             p.className = 'pill'; p.innerText = i;
             p.onclick = () => {
                 curNum = i; curPill = p;
-                document.getElementById('word').innerText = words[Math.floor(Math.random()*words.length)];
+                document.getElementById('wordBox').innerText = words[Math.floor(Math.random()*words.length)];
                 document.getElementById('overlay').style.display = 'flex';
                 document.getElementById('status').innerText = "tap start to record";
             };
@@ -120,7 +119,7 @@
                 recorder.start();
                 document.getElementById('startBtn').style.display = 'none';
                 document.getElementById('stopBtn').style.display = 'block';
-                document.getElementById('status').innerText = "recording...";
+                document.getElementById('status').innerText = "recording now...";
             } catch (err) {
                 document.getElementById('status').innerText = "mic error - please allow access";
             }
@@ -128,7 +127,7 @@
 
         function stopRec() {
             recorder.stop();
-            document.getElementById('status').innerText = "saving to teacher's drive...";
+            document.getElementById('status').innerText = "sending to drive...";
         }
 
         function upload() {
@@ -142,21 +141,17 @@
                 fetch(scriptURL, {
                     method: 'POST',
                     body: JSON.stringify({ audio: base64, filename: filename }),
-                    mode: 'no-cors'
-                })
-                .then(() => {
+                    mode: 'no-cors' 
+                }).then(() => {
                     curPill.innerText = "done ✓";
                     curPill.classList.add('completed');
                     document.getElementById('status').innerText = "successfully saved!";
-                    setTimeout(closeM, 1200);
-                })
-                .catch(() => {
-                    document.getElementById('status').innerText = "connection error. try again.";
+                    setTimeout(closeModal, 1500);
                 });
             };
         }
 
-        function closeM() { 
+        function closeModal() { 
             document.getElementById('overlay').style.display = 'none'; 
             document.getElementById('startBtn').style.display = 'block';
             document.getElementById('stopBtn').style.display = 'none';
